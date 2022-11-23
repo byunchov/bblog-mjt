@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.byunchov.bblog.users.converter.UserConverter;
+import net.byunchov.bblog.users.dto.UserAuthDto;
+import net.byunchov.bblog.users.dto.UserDto;
 import net.byunchov.bblog.users.exceptions.UserNotFoundException;
 import net.byunchov.bblog.users.models.Authority;
 import net.byunchov.bblog.users.models.UserDao;
@@ -25,8 +29,9 @@ import net.byunchov.bblog.utils.DataUtils;
 @Service
 @Slf4j
 public class UserService {
-    // @Autowired
-    // private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserConverter userConverter;
 
     @Autowired
     private UserRepository userRepository;
@@ -34,60 +39,77 @@ public class UserService {
     @Autowired
     private AuthorityRepository authorityRepository;
 
+    private static final String ROLE_USER = "ROLE_USER";
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    public UserDao save(UserDao user) {
+    public UserDto createUser(UserDao user) {
 
-        if (user.getId() == null) {
-            Set<Authority> authorities = user.getAuthorities();
-            if (authorities == null || authorities.isEmpty()) {
-                authorities = new HashSet<>();
-                authorityRepository.findById("ROLE_USER").ifPresent(authorities::add);
-                user.setAuthorities(authorities);
-            }
+        if (user.getId() == null) {            
+            user.setAuthorities(setAuthoritiesByUser(user));
         }
-
         user.setPassword(passwordEncoder().encode(user.getPassword()));
-        return userRepository.save(user);
+        UserDao createdUser = userRepository.save(user);
+
+        return userConverter.convertEntityToDto(createdUser);
     }
 
-    public UserDao updateUser(Long id, UserDao user) {
+    public UserDto updateUser(Long id, UserDao user) {
         log.info(user.toString());
         UserDao existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User by id %d was not found", id)));
         DataUtils.copyNonNullProperties(user, existingUser);
 
-        if(user.getPassword() != null){
+        if (user.getPassword() != null) {
             existingUser.setPassword(passwordEncoder().encode(user.getPassword()));
         }
 
-        return userRepository.save(existingUser);
+        if(existingUser.getAuthorities().isEmpty()){
+            existingUser.setAuthorities(setAuthoritiesByUser(existingUser));
+        }
+
+        UserDao createdUser = userRepository.save(existingUser);
+
+        return userConverter.convertEntityToDto(createdUser);
     }
 
     public void delete(UserDao user) {
         userRepository.delete(user);
     }
 
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
+    public void deleteById(Long id) throws UserNotFoundException {
+        try {
+            userRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserNotFoundException(String.format("User by id %d was not found", id));
+        }
     }
 
-    public UserDao findById(Long id) throws UserNotFoundException {
-        return userRepository.findById(id)
+    public UserDto findById(Long id) throws UserNotFoundException {
+        UserDao user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User by id %d was not found", id)));
+        return userConverter.convertEntityToDto(user);
     }
 
-    public UserDao findByName(String username) throws UserNotFoundException {
-        return userRepository.findByUsername(username)
+    public UserDto findByUsername(String username) throws UserNotFoundException {
+        UserDao user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User by %s was not found", username)));
+        return userConverter.convertEntityToDto(user);
     }
 
-    public UserDao findOneByEmail(String email) throws UserNotFoundException {
-        return userRepository.findByEmailIgnoreCase(email)
+    public UserAuthDto authByUsername(String username) throws UserNotFoundException {
+        UserDao user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("User by %s was not found", username)));
+        return userConverter.convertEntityToAuthDto(user);
+    }
+
+    public UserDto findOneByEmail(String email) throws UserNotFoundException {
+        UserDao user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with %s was not found", email)));
+        return userConverter.convertEntityToDto(user);
     }
 
     public List<GrantedAuthority> getGrantedAuthoritiesByName(String username) throws UserNotFoundException {
@@ -106,4 +128,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    public Set<Authority> setAuthoritiesByUser(UserDao user) throws UserNotFoundException {
+        Set<Authority> authorities = user.getAuthorities();
+        if (authorities == null || authorities.isEmpty()) {
+            authorities = new HashSet<>();
+            authorityRepository.findById(ROLE_USER).ifPresent(authorities::add);
+        }
+
+        return authorities;
+    }
 }

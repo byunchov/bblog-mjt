@@ -12,7 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import net.byunchov.bblog.users.models.UserDao;
+import net.byunchov.bblog.users.dto.UserAuthDto;
 import net.byunchov.bblog.users.services.UserService;
 
 @Component
@@ -28,7 +28,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = auth.getName();
         String password = auth.getCredentials().toString();
 
-        UserDao user = userService.findByName(username);
+        UserAuthDto user = userService.authByUsername(username);
         if (user == null) {
             throw new BadCredentialsException("Invalid username");
         }

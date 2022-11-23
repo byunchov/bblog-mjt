@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import net.byunchov.bblog.users.dto.UserDto;
 import net.byunchov.bblog.users.exceptions.UserNotFoundException;
 import net.byunchov.bblog.users.models.UserDao;
 import net.byunchov.bblog.users.services.UserService;
@@ -28,20 +29,20 @@ public class UserController {
 
     @SneakyThrows
     @GetMapping("/{id}")
-    public ResponseEntity<UserDao> getUserById(@PathVariable Long id) {
-        UserDao user = userService.findById(id);
+    public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
+        UserDto user = userService.findById(id);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserDao> createUser(@RequestBody UserDao user) {
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDao user) {
         log.info(user.toString());
-        UserDao newAccount = userService.save(user);
-        return new ResponseEntity<UserDao>(newAccount, HttpStatus.CREATED);
+        UserDto newAccount = userService.createUser(user);
+        return new ResponseEntity<UserDto>(newAccount, HttpStatus.CREATED);
     }
 
     @PatchMapping(value="/{id}/update")
-    public ResponseEntity<UserDao> updateUser(@PathVariable Long id, @RequestBody UserDao user) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDao user) {
         var updatedUser = userService.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
