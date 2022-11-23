@@ -40,6 +40,7 @@ public class UserService {
     private AuthorityRepository authorityRepository;
 
     private static final String ROLE_USER = "ROLE_USER";
+    private static final String NOT_FOUND_MSG = "User with [%s] was not found";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -57,10 +58,10 @@ public class UserService {
         return userConverter.convertEntityToDto(createdUser);
     }
 
-    public UserDto updateUser(Long id, UserDao user) {
+    public UserDto updateUser(Long id, UserDao user) throws UserNotFoundException {
         log.info(user.toString());
         UserDao existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by id %d was not found", id)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, id)));
         DataUtils.copyNonNullProperties(user, existingUser);
 
         if (user.getPassword() != null) {
@@ -77,45 +78,49 @@ public class UserService {
     }
 
     public void delete(UserDao user) {
-        userRepository.delete(user);
+        try {
+            userRepository.delete(user);
+        } catch (EmptyResultDataAccessException e) {
+            throw new UserNotFoundException(String.format(NOT_FOUND_MSG, user.getId()));
+        }
     }
 
     public void deleteById(Long id) throws UserNotFoundException {
         try {
             userRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new UserNotFoundException(String.format("User by id %d was not found", id));
+            throw new UserNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
     }
 
     public UserDto findById(Long id) throws UserNotFoundException {
         UserDao user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by id %d was not found", id)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, id)));
         return userConverter.convertEntityToDto(user);
     }
 
     public UserDto findByUsername(String username) throws UserNotFoundException {
         UserDao user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by %s was not found", username)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, username)));
         return userConverter.convertEntityToDto(user);
     }
 
     public UserAuthDto authByUsername(String username) throws UserNotFoundException {
         UserDao user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by %s was not found", username)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, username)));
         return userConverter.convertEntityToAuthDto(user);
     }
 
     public UserDto findOneByEmail(String email) throws UserNotFoundException {
         UserDao user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with %s was not found", email)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, email)));
         return userConverter.convertEntityToDto(user);
     }
 
     public List<GrantedAuthority> getGrantedAuthoritiesByName(String username) throws UserNotFoundException {
 
         UserDao user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User by %s was not found", username)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, username)));
 
         var authorities = user.getAuthorities();
         if (authorities == null || authorities.isEmpty()) {
