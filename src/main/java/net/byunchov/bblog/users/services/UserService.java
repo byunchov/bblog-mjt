@@ -47,18 +47,16 @@ public class UserService {
         return new BCryptPasswordEncoder();
     }
 
-    public UserDto createUser(UserDao user) {
-
-        if (user.getId() == null) {            
-            user.setAuthorities(setAuthoritiesByUser(user));
-        }
-        user.setPassword(passwordEncoder().encode(user.getPassword()));
-        UserDao createdUser = userRepository.save(user);
+    public UserDto createUser(UserDto user) {
+        UserDao userDao = userConverter.convertDtoToEntity(user);
+        userDao.setAuthorities(setAuthoritiesByUser(userDao));
+        userDao.setPassword(passwordEncoder().encode(user.getPassword()));
+        UserDao createdUser = userRepository.save(userDao);
 
         return userConverter.convertEntityToDto(createdUser);
     }
 
-    public UserDto updateUser(Long id, UserDao user) throws UserNotFoundException {
+    public UserDto updateUser(Long id, UserDto user) throws UserNotFoundException {
         log.info(user.toString());
         UserDao existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND_MSG, id)));
@@ -68,7 +66,7 @@ public class UserService {
             existingUser.setPassword(passwordEncoder().encode(user.getPassword()));
         }
 
-        if(existingUser.getAuthorities().isEmpty()){
+        if (existingUser.getAuthorities().isEmpty()) {
             existingUser.setAuthorities(setAuthoritiesByUser(existingUser));
         }
 

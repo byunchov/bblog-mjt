@@ -49,4 +49,3 @@ public class UserDao implements Serializable{
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<Authority> authorities;
 }
-

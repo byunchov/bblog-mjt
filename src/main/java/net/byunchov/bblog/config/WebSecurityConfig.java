@@ -25,6 +25,7 @@ public class WebSecurityConfig {
 	private static final String[] WHITELIST = {
 			"/",
 			"/users/create",
+			"/users/{^[\\d]$}",
 	};
 
 	private static final String[] ANT_PATTERNS = {
@@ -53,6 +54,8 @@ public class WebSecurityConfig {
 							// .antMatchers("/users/**/delete").hasRole(ROLE_ADMIN)
 							// .antMatchers("/users/**").hasAnyRole(ROLE_USER, ROLE_ADMIN)
 							.antMatchers(HttpMethod.GET, "/posts/**").permitAll()
+							.antMatchers(HttpMethod.GET, "/users/**").hasRole(ROLE_ADMIN)
+							// .antMatchers(HttpMethod.GET, "/users/{^[\\d]$}").hasAnyRole(ROLE_USER, ROLE_ADMIN)
 							.antMatchers(HttpMethod.POST, ANT_PATTERNS).hasAnyRole(ROLE_USER, ROLE_ADMIN)
 							.antMatchers(HttpMethod.PATCH, ANT_PATTERNS).hasAnyRole(ROLE_USER, ROLE_ADMIN)
 							.antMatchers(HttpMethod.DELETE, ANT_PATTERNS).hasRole(ROLE_ADMIN)

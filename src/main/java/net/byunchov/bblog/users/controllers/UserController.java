@@ -14,15 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import net.byunchov.bblog.users.dto.UserDto;
 import net.byunchov.bblog.users.exceptions.UserNotFoundException;
-import net.byunchov.bblog.users.models.UserDao;
 import net.byunchov.bblog.users.services.UserService;
 
 @Controller
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
     @Autowired
     private UserService userService;
@@ -35,15 +32,14 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDao user) {
-        log.info(user.toString());
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
         UserDto newAccount = userService.createUser(user);
         return new ResponseEntity<UserDto>(newAccount, HttpStatus.CREATED);
     }
 
     @PatchMapping(value="/{id}/update")
-    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDao user) {
-        var updatedUser = userService.updateUser(id, user);
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto user) {
+        UserDto updatedUser = userService.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
 

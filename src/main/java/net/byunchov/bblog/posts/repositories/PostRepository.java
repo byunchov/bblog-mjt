@@ -10,4 +10,5 @@ import net.byunchov.bblog.posts.models.PostDao;
 @Repository
 public interface PostRepository extends PagingAndSortingRepository<PostDao, Long> {
     Page<PostDao> findByTitleContaining(String title, Pageable pageable);
+    Page<PostDao> findByAuthorUsername(String username, Pageable pageable);
 }

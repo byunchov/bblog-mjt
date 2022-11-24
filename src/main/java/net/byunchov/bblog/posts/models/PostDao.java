@@ -25,7 +25,7 @@ import net.byunchov.bblog.users.models.UserDao;
 @Table(name = "posts")
 public class PostDao implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;

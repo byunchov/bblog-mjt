@@ -1,13 +1,13 @@
 package net.byunchov.bblog.posts.services;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import net.byunchov.bblog.posts.converter.PostConverter;
@@ -31,7 +31,8 @@ public class PostService {
     @Autowired
     private PostConverter postConverter;
 
-    private static final String NOT_FOUND_MSG = "Post %d not found";
+    private static final String NOT_FOUND_MSG = "Post %s not found";
+    private static final String ACC_DENIED_MSG = "Insufficient rights. Access Denied!";
 
     public PostDao createPost(PostDao post) {
         if (post.getId() == null) {
@@ -50,9 +51,23 @@ public class PostService {
         return postRepository.save(newPost);
     }
 
-    public PostDao updatePost(Long id, PostDao post) {
+    public PostDao updatePost(Long id, PostDto post, String username)
+            throws PostNotFoundException, AccessDeniedException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         PostDao existingPost = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(String.format(NOT_FOUND_MSG, id)));
+
+        String authorUsername = existingPost.getAuthor().getUsername();
+
+        Boolean isAdmin = auth.getAuthorities()
+                .stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!authorUsername.equals(username) && !isAdmin) {
+            throw new AccessDeniedException(ACC_DENIED_MSG);
+        }
+
         DataUtils.copyNonNullProperties(post, existingPost);
         existingPost.setUpdatedAt(LocalDateTime.now());
 
@@ -64,7 +79,7 @@ public class PostService {
         try {
             postRepository.delete(post);
         } catch (EmptyResultDataAccessException e) {
-            throw new PostNotFoundException("Post not found");
+            throw new PostNotFoundException(String.format(NOT_FOUND_MSG, ""));
         }
     }
 
@@ -72,7 +87,7 @@ public class PostService {
         try {
             postRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new PostNotFoundException("Post not found");
+            throw new PostNotFoundException(String.format(NOT_FOUND_MSG, id));
         }
     }
 
@@ -87,5 +102,9 @@ public class PostService {
 
     public Page<PostDao> findByTitleContaining(String title, Pageable pageable) {
         return postRepository.findByTitleContaining(title, pageable);
+    }
+
+    public Page<PostDao> findByAuthorUsername(String username, Pageable pageable) {
+        return postRepository.findByAuthorUsername(username, pageable);
     }
 }
