@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import net.byunchov.bblog.posts.converter.PostConverter;
@@ -78,7 +81,11 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(String.format(NOT_FOUND_MSG, id)));
     }
 
-    public List<PostDao> getAllPosts() {
-        return postRepository.findAll();
+    public Page<PostDao> findAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable);
+    }
+
+    public Page<PostDao> findByTitleContaining(String title, Pageable pageable) {
+        return postRepository.findByTitleContaining(title, pageable);
     }
 }

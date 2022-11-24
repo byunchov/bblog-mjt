@@ -1,9 +1,10 @@
 package net.byunchov.bblog.posts.controllers;
 
 import java.security.Principal;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +33,14 @@ public class PostController {
     private PostService postService;
 
     @GetMapping("")
-    public ResponseEntity<List<PostDao>> getAllPosts() {
-        List<PostDao> user = postService.getAllPosts();
-        return ResponseEntity.ok(user);
+    public ResponseEntity<Page<PostDao>> getAllPosts(@RequestParam(required = false) String title,
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        if (title != null) {
+            return ResponseEntity.ok(postService.findByTitleContaining(title, pageRequest));
+        }
+        return ResponseEntity.ok(postService.findAllPosts(pageRequest));
     }
 
     @SneakyThrows
@@ -51,17 +58,17 @@ public class PostController {
         return new ResponseEntity<PostDao>(newPost, HttpStatus.CREATED);
     }
 
-    @PatchMapping(value="/{id}/update")
+    @PatchMapping(value = "/{id}/update")
     public ResponseEntity<PostDao> updateUser(@PathVariable Long id, @RequestBody PostDao user) {
         PostDao updatedPost = postService.updatePost(id, user);
         return ResponseEntity.ok(updatedPost);
     }
 
-    @DeleteMapping(value="/{id}/delete")
+    @DeleteMapping(value = "/{id}/delete")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         postService.deletePostById(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }    
+    }
 
     @ExceptionHandler(value = PostNotFoundException.class)
     private ResponseEntity<String> handlePostNotFoundException(PostNotFoundException e) {
