@@ -1,0 +1,13 @@
+use bblog;
+insert into users (id, first_name, last_name, username, password, email) values (1, 'Janine', 'Bellenie', 'jbellenie0', 'nLisIShTfF', 'jbellenie0@cisco.com');
+insert into users (id, first_name, last_name, username, password, email) values (2, 'Gavra', 'Dedden', 'gdedden1', 'z3K0ziCg', 'gdedden1@hugedomains.com');
+insert into users (id, first_name, last_name, username, password, email) values (3, 'Chuck', 'Tegler', 'ctegler2', 'VFZS3MitjCCU', 'ctegler2@digg.com');
+insert into users (id, first_name, last_name, username, password, email) values (4, 'Mitchell', 'Farlambe', 'mfarlambe3', 'uCXMYOOQ', 'mfarlambe3@tinyurl.com');
+insert into users (id, first_name, last_name, username, password, email) values (5, 'Mycah', 'Skullet', 'mskullet4', 'ViuFLH1F5AFk', 'mskullet4@slashdot.org');
+insert into users (id, first_name, last_name, username, password, email) values (6, 'Shellie', 'Jaukovic', 'sjaukovic5', 'ksaFNuSEgC', 'sjaukovic5@sciencedirect.com');
+insert into users (id, first_name, last_name, username, password, email) values (7, 'Rita', 'Piscot', 'rpiscot6', 'dSF577IGQSt', 'rpiscot6@mashable.com');
+insert into users (id, first_name, last_name, username, password, email) values (8, 'Ingeborg', 'Radbourn', 'iradbourn7', 'P9AUg5JN', 'iradbourn7@storify.com');
+insert into users (id, first_name, last_name, username, password, email) values (9, 'Corrie', 'Morfey', 'cmorfey8', 'tsKtbp8ot8RH', 'cmorfey8@friendfeed.com');
+insert into users (id, first_name, last_name, username, password, email) values (10, 'Lewie', 'Shilburne', 'lshilburne9', 'aHck3I6k', 'lshilburne9@123-reg.co.uk');
+insert into users (id, first_name, last_name, username, password, email) values (11, 'Finley', 'Frise', 'ffrisea', 'NSZqjHOV', 'ffrisea@ox.ac.uk');
+insert into users (id, first_name, last_name, username, password, email) values (12, 'Danyelle', 'Andriuzzi', 'dandriuzzib', 'YN0KAAKV', 'dandriuzzib@360.cn');

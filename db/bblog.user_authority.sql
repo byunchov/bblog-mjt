@@ -1,0 +1,12 @@
+insert into bblog.user_authority (user_id, authority_name) values (1, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (2, 'ROLE_USER');
+insert into bblog.user_authority (user_id, authority_name) values (3, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (4, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (5, 'ROLE_USER');
+insert into bblog.user_authority (user_id, authority_name) values (6, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (7, 'ROLE_USER');
+insert into bblog.user_authority (user_id, authority_name) values (8, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (9, 'ROLE_USER');
+insert into bblog.user_authority (user_id, authority_name) values (10, 'ROLE_USER');
+insert into bblog.user_authority (user_id, authority_name) values (11, 'ROLE_ADMIN');
+insert into bblog.user_authority (user_id, authority_name) values (12, 'ROLE_ADMIN');
