@@ -37,7 +37,7 @@ public class WebSecurityConfig {
 	public static final String ROLE_USER = "USER";
 
 	@Bean
-	public AuthenticationManager authManager(HttpSecurity http) throws Exception {
+	public AuthenticationManager authManager(HttpSecurity http) throws Exception  {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);
 		authenticationManagerBuilder.authenticationProvider(authProvider);

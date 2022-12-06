@@ -69,8 +69,8 @@ public class PostService {
         DataUtils.copyNonNullProperties(post, existingPost);
         existingPost.setUpdatedAt(LocalDateTime.now());
 
-        PostDao createdUser = postRepository.save(existingPost);
-        return createdUser;
+        PostDao createdPost = postRepository.save(existingPost);
+        return createdPost;
     }
 
     public void deletePost(PostDao post) {

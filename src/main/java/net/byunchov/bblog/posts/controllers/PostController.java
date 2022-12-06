@@ -48,28 +48,28 @@ public class PostController {
 
     @SneakyThrows
     @GetMapping("/{id}")
-    public ResponseEntity<PostDao> getUserById(@PathVariable Long id) {
-        PostDao user = postService.findPostById(id);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<PostDao> getPostById(@PathVariable Long id) {
+        PostDao post = postService.findPostById(id);
+        return ResponseEntity.ok(post);
     }
 
     @SneakyThrows
     @PostMapping("/create")
-    public ResponseEntity<PostDao> createUser(@RequestBody PostDto post, Principal principal) {
+    public ResponseEntity<PostDao> createPost(@RequestBody PostDto post, Principal principal) {
         PostDao newPost = postService.createPost(post, principal.getName());
         return new ResponseEntity<PostDao>(newPost, HttpStatus.CREATED);
     }
 
     @SneakyThrows
     @PatchMapping(value = "/{id}/update")
-    public ResponseEntity<PostDao> updateUser(@PathVariable Long id, @RequestBody PostDto body, Principal principal) {
+    public ResponseEntity<PostDao> updatePost(@PathVariable Long id, @RequestBody PostDto body, Principal principal) {
         PostDao updatedPost = postService.updatePost(id, body, principal.getName());
         return ResponseEntity.ok(updatedPost);
     }
 
     @SneakyThrows
     @DeleteMapping(value = "/{id}/delete")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deletePost(@PathVariable Long id) {
         postService.deletePostById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
