@@ -18,6 +18,7 @@ import net.byunchov.bblog.posts.repositories.PostRepository;
 import net.byunchov.bblog.users.models.UserDao;
 import net.byunchov.bblog.users.repositories.UserRepository;
 import net.byunchov.bblog.utils.DataUtils;
+import net.byunchov.bblog.utils.MessageUtils;
 
 @Service
 public class PostService {
@@ -30,9 +31,6 @@ public class PostService {
 
     @Autowired
     private PostConverter postConverter;
-
-    private static final String NOT_FOUND_MSG = "Post %s not found";
-    private static final String ACC_DENIED_MSG = "Insufficient rights. Access Denied!";
 
     public PostDao createPost(PostDao post) {
         if (post.getId() == null) {
@@ -56,7 +54,7 @@ public class PostService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         PostDao existingPost = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(String.format(NOT_FOUND_MSG, id)));
+                .orElseThrow(() -> new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, id)));
 
         String authorUsername = existingPost.getAuthor().getUsername();
 
@@ -65,7 +63,7 @@ public class PostService {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (!authorUsername.equals(username) && !isAdmin) {
-            throw new AccessDeniedException(ACC_DENIED_MSG);
+            throw new AccessDeniedException(MessageUtils.ACC_DENIED_MSG);
         }
 
         DataUtils.copyNonNullProperties(post, existingPost);
@@ -79,7 +77,7 @@ public class PostService {
         try {
             postRepository.delete(post);
         } catch (EmptyResultDataAccessException e) {
-            throw new PostNotFoundException(String.format(NOT_FOUND_MSG, ""));
+            throw new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, ""));
         }
     }
 
@@ -87,13 +85,13 @@ public class PostService {
         try {
             postRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new PostNotFoundException(String.format(NOT_FOUND_MSG, id));
+            throw new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, id));
         }
     }
 
     public PostDao findPostById(Long id) throws PostNotFoundException {
         return postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(String.format(NOT_FOUND_MSG, id)));
+                .orElseThrow(() -> new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, id)));
     }
 
     public Page<PostDao> findAllPosts(Pageable pageable) {
