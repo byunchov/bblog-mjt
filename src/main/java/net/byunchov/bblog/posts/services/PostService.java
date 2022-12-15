@@ -1,6 +1,10 @@
 package net.byunchov.bblog.posts.services;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
@@ -38,7 +42,7 @@ public class PostService {
             post.setCreatedAt(LocalDateTime.now());
         }
         post.setUpdatedAt(LocalDateTime.now());
-        
+
         PostDao createdPost = postRepository.save(post);
         return postConverter.convertEntityToDto(createdPost);
     }
@@ -100,8 +104,14 @@ public class PostService {
         return postConverter.convertEntityToDto(post);
     }
 
+    public List<PostDto> findAllPosts() {
+        return StreamSupport
+                .stream(postRepository.findAll().spliterator(), false)
+                .map(postConverter::convertEntityToDto).collect(Collectors.toList());
+    }
+
     public Page<PostDto> findAllPosts(Pageable pageable) {
-       return postRepository.findAll(pageable).map(postConverter::convertEntityToDto);
+        return postRepository.findAll(pageable).map(postConverter::convertEntityToDto);
     }
 
     public Page<PostDto> findByTitleContaining(String title, Pageable pageable) {

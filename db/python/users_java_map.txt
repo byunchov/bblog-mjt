@@ -1,0 +1,98 @@
+Arrays.asList(
+new HashMap<String, String>() {{
+     put("id", "1");
+     put("first_name", "Janine");
+     put("last_name", "Bellenie");
+     put("username", "jbellenie0");
+     put("password", "nLisIShTfF");
+     put("email", "jbellenie0@cisco.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "2");
+     put("first_name", "Gavra");
+     put("last_name", "Dedden");
+     put("username", "gdedden1");
+     put("password", "z3K0ziCg");
+     put("email", "gdedden1@hugedomains.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "3");
+     put("first_name", "Chuck");
+     put("last_name", "Tegler");
+     put("username", "ctegler2");
+     put("password", "VFZS3MitjCCU");
+     put("email", "ctegler2@digg.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "4");
+     put("first_name", "Mitchell");
+     put("last_name", "Farlambe");
+     put("username", "mfarlambe3");
+     put("password", "uCXMYOOQ");
+     put("email", "mfarlambe3@tinyurl.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "5");
+     put("first_name", "Mycah");
+     put("last_name", "Skullet");
+     put("username", "mskullet4");
+     put("password", "ViuFLH1F5AFk");
+     put("email", "mskullet4@slashdot.org");
+}},
+new HashMap<String, String>() {{
+     put("id", "6");
+     put("first_name", "Shellie");
+     put("last_name", "Jaukovic");
+     put("username", "sjaukovic5");
+     put("password", "ksaFNuSEgC");
+     put("email", "sjaukovic5@sciencedirect.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "7");
+     put("first_name", "Rita");
+     put("last_name", "Piscot");
+     put("username", "rpiscot6");
+     put("password", "dSF577IGQSt");
+     put("email", "rpiscot6@mashable.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "8");
+     put("first_name", "Ingeborg");
+     put("last_name", "Radbourn");
+     put("username", "iradbourn7");
+     put("password", "P9AUg5JN");
+     put("email", "iradbourn7@storify.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "9");
+     put("first_name", "Corrie");
+     put("last_name", "Morfey");
+     put("username", "cmorfey8");
+     put("password", "tsKtbp8ot8RH");
+     put("email", "cmorfey8@friendfeed.com");
+}},
+new HashMap<String, String>() {{
+     put("id", "10");
+     put("first_name", "Lewie");
+     put("last_name", "Shilburne");
+     put("username", "lshilburne9");
+     put("password", "aHck3I6k");
+     put("email", "lshilburne9@123-reg.co.uk");
+}},
+new HashMap<String, String>() {{
+     put("id", "11");
+     put("first_name", "Finley");
+     put("last_name", "Frise");
+     put("username", "ffrisea");
+     put("password", "NSZqjHOV");
+     put("email", "ffrisea@ox.ac.uk");
+}},
+new HashMap<String, String>() {{
+     put("id", "12");
+     put("first_name", "Danyelle");
+     put("last_name", "Andriuzzi");
+     put("username", "dandriuzzib");
+     put("password", "YN0KAAKV");
+     put("email", "dandriuzzib@360.cn");
+}},
+);

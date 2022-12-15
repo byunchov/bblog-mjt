@@ -52,6 +52,12 @@ public class UserService {
         return new BCryptPasswordEncoder();
     }
 
+    public UserDao saveUser(UserDao user){
+        user.setAuthorities(setAuthoritiesByUser(user));
+        user.setPassword(passwordEncoder().encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
     public UserDto createUser(UserDto user) throws UserAlreadyExistsException, EmailAlreadyUsedException, InvalidEmailException {
         boolean isExistingUser = userRepository.findByUsername(user.getUsername()).isPresent();
         

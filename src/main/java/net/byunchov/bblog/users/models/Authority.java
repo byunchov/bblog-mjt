@@ -8,6 +8,7 @@ import lombok.*;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "authorities")
 public class Authority implements Serializable {
     @Id
