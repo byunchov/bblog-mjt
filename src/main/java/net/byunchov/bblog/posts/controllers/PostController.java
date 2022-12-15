@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import lombok.SneakyThrows;
 import net.byunchov.bblog.posts.dto.PostDto;
 import net.byunchov.bblog.posts.exceptions.PostNotFoundException;
-import net.byunchov.bblog.posts.models.PostDao;
 import net.byunchov.bblog.posts.services.PostService;
 
 @Controller
@@ -32,7 +31,7 @@ public class PostController {
     private PostService postService;
 
     @GetMapping("")
-    public ResponseEntity<Page<PostDao>> getAllPosts(@RequestParam(required = false) String title,
+    public ResponseEntity<Page<PostDto>> getAllPosts(@RequestParam(required = false) String title,
     @RequestParam(required = false) String username,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
         PageRequest pageRequest = PageRequest.of(page, size);
@@ -48,22 +47,22 @@ public class PostController {
 
     @SneakyThrows
     @GetMapping("/{id}")
-    public ResponseEntity<PostDao> getPostById(@PathVariable Long id) {
-        PostDao post = postService.findPostById(id);
+    public ResponseEntity<PostDto> getPostById(@PathVariable Long id) {
+        PostDto post = postService.findPostById(id);
         return ResponseEntity.ok(post);
     }
 
     @SneakyThrows
     @PostMapping("/create")
-    public ResponseEntity<PostDao> createPost(@RequestBody PostDto post, Principal principal) {
-        PostDao newPost = postService.createPost(post, principal.getName());
-        return new ResponseEntity<PostDao>(newPost, HttpStatus.CREATED);
+    public ResponseEntity<PostDto> createPost(@RequestBody PostDto post, Principal principal) {
+        PostDto newPost = postService.createPost(post, principal.getName());
+        return new ResponseEntity<PostDto>(newPost, HttpStatus.CREATED);
     }
 
     @SneakyThrows
     @PatchMapping(value = "/{id}/update")
-    public ResponseEntity<PostDao> updatePost(@PathVariable Long id, @RequestBody PostDto body, Principal principal) {
-        PostDao updatedPost = postService.updatePost(id, body, principal.getName());
+    public ResponseEntity<PostDto> updatePost(@PathVariable Long id, @RequestBody PostDto body, Principal principal) {
+        PostDto updatedPost = postService.updatePost(id, body, principal.getName());
         return ResponseEntity.ok(updatedPost);
     }
 

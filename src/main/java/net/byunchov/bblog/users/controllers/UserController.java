@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import lombok.SneakyThrows;
 import net.byunchov.bblog.users.dto.UserDto;
+import net.byunchov.bblog.users.exceptions.EmailAlreadyUsedException;
+import net.byunchov.bblog.users.exceptions.InvalidEmailException;
 import net.byunchov.bblog.users.exceptions.UserAlreadyExistsException;
 import net.byunchov.bblog.users.exceptions.UserNotAuthenticatedException;
 import net.byunchov.bblog.users.exceptions.UserNotFoundException;
@@ -61,6 +63,20 @@ public class UserController {
 
     @ExceptionHandler(value = UserAlreadyExistsException.class)
     private ResponseEntity<String> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(value = InvalidEmailException.class)
+    private ResponseEntity<String> handleInvalidEmailException(InvalidEmailException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(value = EmailAlreadyUsedException.class)
+    private ResponseEntity<String> handleEmailAlreadyUsedException(EmailAlreadyUsedException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());

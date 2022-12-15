@@ -19,6 +19,7 @@ import net.byunchov.bblog.users.models.UserDao;
 import net.byunchov.bblog.users.repositories.UserRepository;
 import net.byunchov.bblog.utils.DataUtils;
 import net.byunchov.bblog.utils.MessageUtils;
+import net.byunchov.bblog.utils.UserRoleUtil;
 
 @Service
 public class PostService {
@@ -32,24 +33,27 @@ public class PostService {
     @Autowired
     private PostConverter postConverter;
 
-    public PostDao createPost(PostDao post) {
+    public PostDto createPost(PostDao post) {
         if (post.getId() == null) {
             post.setCreatedAt(LocalDateTime.now());
         }
         post.setUpdatedAt(LocalDateTime.now());
-        return postRepository.save(post);
+        
+        PostDao createdPost = postRepository.save(post);
+        return postConverter.convertEntityToDto(createdPost);
     }
 
-    public PostDao createPost(PostDto post, String username) {
+    public PostDto createPost(PostDto post, String username) {
         PostDao newPost = postConverter.convertDtoToEntity(post);
         UserDao user = userRepository.findByUsername(username).get();
         newPost.setCreatedAt(LocalDateTime.now());
         newPost.setUpdatedAt(LocalDateTime.now());
         newPost.setAuthor(user);
-        return postRepository.save(newPost);
+        PostDao createdPost = postRepository.save(newPost);
+        return postConverter.convertEntityToDto(createdPost);
     }
 
-    public PostDao updatePost(Long id, PostDto post, String username)
+    public PostDto updatePost(Long id, PostDto post, String username)
             throws PostNotFoundException, AccessDeniedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -60,7 +64,7 @@ public class PostService {
 
         Boolean isAdmin = auth.getAuthorities()
                 .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(UserRoleUtil.ROLE_ADMIN));
 
         if (!authorUsername.equals(username) && !isAdmin) {
             throw new AccessDeniedException(MessageUtils.ACC_DENIED_MSG);
@@ -70,14 +74,14 @@ public class PostService {
         existingPost.setUpdatedAt(LocalDateTime.now());
 
         PostDao createdPost = postRepository.save(existingPost);
-        return createdPost;
+        return postConverter.convertEntityToDto(createdPost);
     }
 
     public void deletePost(PostDao post) {
         try {
             postRepository.delete(post);
         } catch (EmptyResultDataAccessException e) {
-            throw new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, ""));
+            throw new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, post.getTitle()));
         }
     }
 
@@ -89,20 +93,22 @@ public class PostService {
         }
     }
 
-    public PostDao findPostById(Long id) throws PostNotFoundException {
-        return postRepository.findById(id)
+    public PostDto findPostById(Long id) throws PostNotFoundException {
+        PostDao post = postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(String.format(MessageUtils.POST_NOT_FOUND_MSG, id)));
+
+        return postConverter.convertEntityToDto(post);
     }
 
-    public Page<PostDao> findAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable);
+    public Page<PostDto> findAllPosts(Pageable pageable) {
+       return postRepository.findAll(pageable).map(postConverter::convertEntityToDto);
     }
 
-    public Page<PostDao> findByTitleContaining(String title, Pageable pageable) {
-        return postRepository.findByTitleContaining(title, pageable);
+    public Page<PostDto> findByTitleContaining(String title, Pageable pageable) {
+        return postRepository.findByTitleContaining(title, pageable).map(postConverter::convertEntityToDto);
     }
 
-    public Page<PostDao> findByAuthorUsername(String username, Pageable pageable) {
-        return postRepository.findByAuthorUsername(username, pageable);
+    public Page<PostDto> findByAuthorUsername(String username, Pageable pageable) {
+        return postRepository.findByAuthorUsername(username, pageable).map(postConverter::convertEntityToDto);
     }
 }

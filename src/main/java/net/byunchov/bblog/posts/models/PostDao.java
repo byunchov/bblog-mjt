@@ -45,9 +45,3 @@ public class PostDao implements Serializable {
     @JsonManagedReference
     private UserDao author;
 }
-
-// "title": "",
-// "content": "",
-// "author": {
-//     "id": 1
-// }

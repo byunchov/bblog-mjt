@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import net.byunchov.bblog.users.converter.UserConverter;
 import net.byunchov.bblog.users.dto.UserAuthDto;
 import net.byunchov.bblog.users.dto.UserDto;
+import net.byunchov.bblog.users.exceptions.EmailAlreadyUsedException;
+import net.byunchov.bblog.users.exceptions.InvalidEmailException;
 import net.byunchov.bblog.users.exceptions.UserAlreadyExistsException;
 import net.byunchov.bblog.users.exceptions.UserNotAuthenticatedException;
 import net.byunchov.bblog.users.exceptions.UserNotFoundException;
@@ -30,6 +32,8 @@ import net.byunchov.bblog.users.repositories.AuthorityRepository;
 import net.byunchov.bblog.users.repositories.UserRepository;
 import net.byunchov.bblog.utils.DataUtils;
 import net.byunchov.bblog.utils.MessageUtils;
+import net.byunchov.bblog.utils.RegexUtil;
+import net.byunchov.bblog.utils.UserRoleUtil;
 
 @Service
 public class UserService {
@@ -43,21 +47,30 @@ public class UserService {
     @Autowired
     private AuthorityRepository authorityRepository;
 
-    private static final String ROLE_USER = "ROLE_USER";
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    public UserDto createUser(UserDto user) throws UserAlreadyExistsException {
-
+    public UserDto createUser(UserDto user) throws UserAlreadyExistsException, EmailAlreadyUsedException, InvalidEmailException {
         boolean isExistingUser = userRepository.findByUsername(user.getUsername()).isPresent();
-
+        
         if (isExistingUser) {
             throw new UserAlreadyExistsException(String.format(MessageUtils.USER_EXISTS_MSG, user.getUsername()));
         }
-        
+
+        boolean isEmailValid = RegexUtil.isValidEmailAddress(user.getEmail());
+    
+        if (!isEmailValid) {
+            throw new InvalidEmailException(String.format(MessageUtils.EMAIL_INVALID_MSG, user.getEmail()));
+        }
+
+        boolean isExistingEmail = userRepository.findByEmailIgnoreCase(user.getEmail()).isPresent();
+
+        if (isExistingEmail) {
+            throw new EmailAlreadyUsedException(String.format(MessageUtils.EMAIL_TAKEN_MSG, user.getEmail()));
+        }
+
         UserDao userDao = userConverter.convertDtoToEntity(user);
         userDao.setAuthorities(setAuthoritiesByUser(userDao));
         userDao.setPassword(passwordEncoder().encode(user.getPassword()));
@@ -84,7 +97,7 @@ public class UserService {
 
         Boolean isAdmin = auth.getAuthorities()
                 .stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals(UserRoleUtil.ROLE_ADMIN));
 
         if (!loggedUserName.equals(existingUser.getUsername()) && !isAdmin) {
             throw new AccessDeniedException(MessageUtils.ACC_DENIED_MSG);
@@ -163,7 +176,7 @@ public class UserService {
         Set<Authority> authorities = user.getAuthorities();
         if (authorities == null || authorities.isEmpty()) {
             authorities = new HashSet<>();
-            authorityRepository.findById(ROLE_USER).ifPresent(authorities::add);
+            authorityRepository.findById(UserRoleUtil.ROLE_USER).ifPresent(authorities::add);
         }
 
         return authorities;

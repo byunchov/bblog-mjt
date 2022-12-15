@@ -11,7 +11,6 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Data
@@ -26,7 +25,6 @@ public class UserDao implements Serializable{
     private String username;
 
     @Column
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column
@@ -46,6 +44,5 @@ public class UserDao implements Serializable{
     @JoinTable(name = "user_authority", joinColumns = {
             @JoinColumn(name = "user_id", referencedColumnName = "id") }, inverseJoinColumns = {
             @JoinColumn(name = "authority_name", referencedColumnName = "name") })
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<Authority> authorities;
 }
